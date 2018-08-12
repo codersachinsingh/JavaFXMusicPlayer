@@ -2,16 +2,15 @@ package musicplayer.media;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
 public class MediaFileExtensionFilter implements FileFilter {
-	Set<String> extensions = new TreeSet<>();
+	private Set<String> extensions = new TreeSet<>();
 	public MediaFileExtensionFilter(String[] list) {
-		for (String s : list) {
-			extensions.add(s);
-		}
+		extensions.addAll(Arrays.asList(list));
 	}
 	
 	public MediaFileExtensionFilter() {
@@ -21,9 +20,9 @@ public class MediaFileExtensionFilter implements FileFilter {
 	public void addExtension(String s) {
 		extensions.add(s);
 	}
+
 	public void addExtension(String[] s) {
-		for(String str : s)
-		extensions.add(str);
+		extensions.addAll(Arrays.asList(s));
 	}
 	public void remove(String s) {
 		extensions.remove(s);
@@ -44,7 +43,7 @@ public class MediaFileExtensionFilter implements FileFilter {
 			return false;
 		else
 			dotIndex++;
-		String fileExtension = filename.substring(dotIndex, filename.length());
+		String fileExtension = filename.substring(dotIndex);
 		while(iterator.hasNext()) {
 			if (fileExtension.compareToIgnoreCase(iterator.next())==0)
 				return true;

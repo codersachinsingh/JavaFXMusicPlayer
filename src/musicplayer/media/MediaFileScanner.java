@@ -1,27 +1,32 @@
 package musicplayer.media;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
+import musicplayer.util.AppUtils;
+import musicplayer.util.DataCollectionSerializer;
 
 public class MediaFileScanner implements MediaScanner {
-	private ObservableSet<String> allowedExtensions = FXCollections.observableSet("mp3");
-	ObservableMap<String, List<String>> mediaFiles = FXCollections.observableHashMap();
-	MediaFileExtensionFilter fileExtensionFilter;
-	MediaLocator mediaLocator;
-	
+	private ObservableSet<String> allowedExtensions;
+	private ObservableMap<String, List<String>> mediaFiles = FXCollections.observableHashMap();
+	private MediaFileExtensionFilter fileExtensionFilter;
+	private MediaLocator mediaLocator;
+	private DataCollectionSerializer<Set<String>> extensionsSetSerializer;
 	public MediaFileScanner(MediaLocator locator) {
 		this.mediaLocator = locator;
+		extensionsSetSerializer = new DataCollectionSerializer<>(AppUtils.ALLOWED_EXTENSIONS_FILE);
+		Set<String> hibernatedSet = extensionsSetSerializer.retrieveState();
+		if (hibernatedSet != null)
+			allowedExtensions = FXCollections.observableSet(hibernatedSet);
+		else
+			allowedExtensions = FXCollections.observableSet();
 		String[] strings = new String[allowedExtensions.size()];
 		fileExtensionFilter = new MediaFileExtensionFilter(allowedExtensions.toArray(strings));
-		startUpScanning();
+		refresh();
 		mediaLocator.getMediaScanLocations().addListener(this::MediaLocationsChangeHandler);
 		allowedExtensions.addListener(this::ExtensionsSetChangeLitsener);
 	}
@@ -31,11 +36,8 @@ public class MediaFileScanner implements MediaScanner {
 	
 	public List<String> getAllMediaFiles() {
 		List<String> list = new ArrayList<>();
-		Iterator<String> iterator = mediaFiles.keySet().iterator();
-		while(iterator.hasNext()) {
-			for (String s : mediaFiles.get(iterator.next())) {
-				list.add(s);
-			}
+		for (String s : mediaFiles.keySet()) {
+			list.addAll(mediaFiles.get(s));
 		}
 		return list;
 	}
@@ -50,6 +52,11 @@ public class MediaFileScanner implements MediaScanner {
 	}
 
 	@Override
+	public void removeAllowedExtention(String extension) {
+		allowedExtensions.remove(extension);
+	}
+
+	@Override
 	public Iterator<String> getAllowedExtensions() {
 		return allowedExtensions.iterator();
 	}
@@ -58,8 +65,9 @@ public class MediaFileScanner implements MediaScanner {
 	public MediaLocator getMediaLocator() {
 		return mediaLocator;
 	}
-	
-	private void startUpScanning() {
+	public ObservableSet<String> getMediaScanLocations() {return mediaLocator.getMediaScanLocations();}
+
+	private void refresh() {
 		Iterator<String> iterator = mediaLocator.getMediaScanLocations().iterator();
 		while(iterator.hasNext()) {
 			String key = iterator.next();
@@ -85,23 +93,30 @@ public class MediaFileScanner implements MediaScanner {
 		else {
 			fileExtensionFilter.remove(litsener.getElementRemoved());
 		}
+
+		Iterator<String> iterator = allowedExtensions.iterator();
+		Set<String> set = new TreeSet<>();
+		while (iterator.hasNext()) {
+			set.add(iterator.next());
+		}
+		extensionsSetSerializer.saveState(set);
+		refresh();
 	}
 	
 	private List<String> scanDirectoryForMedia(String file){
 		List<String> list = new ArrayList<>();
 		File f = new File(file);
 		List<File> files = new ArrayList<>();
-		files = scan(f, files);
+		scan(f, files);
 		for (File o : files) {
 			list.add(o.getAbsolutePath());
 		}
 		return list;
 	}
-	
-	
+
 	private List<File> scan(File file , List<File> files) {
 		if (file.isDirectory()) {
-			for (File f : file.listFiles(fileExtensionFilter))
+			for (File f : Objects.requireNonNull(file.listFiles(fileExtensionFilter)))
 				scan(f, files);
 		}
 		else {
