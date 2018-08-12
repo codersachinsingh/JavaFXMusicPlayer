@@ -20,11 +20,11 @@ public class Main extends Application {
     	String file = "D:\\My Media\\My Music\\Music";
     	MediaLocator locator = MediaScanLocations.getInstance();
     	MediaFileScanner scanner = new MediaFileScanner(locator);
-    	//locator.getMediaScanLocations().add(file);
+    	locator.getMediaScanLocations().add(file);
     	for (String string : scanner.getAllMediaFiles()) {
     		System.out.println(string);
     	}
-    	locator.getMediaScanLocations().remove(file);
+    	//locator.getMediaScanLocations().remove(file);
         launch(args);
     }
 
