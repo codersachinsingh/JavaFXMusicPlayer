@@ -7,7 +7,7 @@ import javafx.scene.image.Image;
 public interface MusicAlbum {
     ReadOnlyStringProperty albumNameProperty();
     String getAlbumName();
-    ObservableList<Song> getSongs();
+    ObservableList<MusicFile> getSongs();
     ReadOnlyObjectProperty<AlbumArtist> albumArtistProperty();
     AlbumArtist getAlbumArtist();
     ReadOnlyIntegerProperty totalSongsProperty();

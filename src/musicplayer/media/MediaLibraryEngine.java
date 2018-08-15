@@ -14,6 +14,7 @@ import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.TagException;
 import org.jaudiotagger.tag.id3.AbstractID3v2Tag;
 import org.jaudiotagger.tag.id3.AbstractTag;
+import org.jaudiotagger.tag.id3.ID3v22Tag;
 import org.jaudiotagger.tag.images.Artwork;
 
 import java.io.BufferedInputStream;
@@ -47,151 +48,108 @@ public class MediaLibraryEngine implements LibraryEngine {
 
 
     }
-
-
     private void processFile(String filepath) {
-        File file = new File(filepath);
         try {
+            File file = new File(filepath);
             MP3File mp3File = new MP3File(file);
-            Song song = createSong(mp3File);
-            /* *** HANDLE ALBUM **/
-            List<String> info = mp3File.getID3v2Tag().getAll(FieldKey.ALBUM);
-            if (!info.isEmpty() && info.get(0).trim().length() > 0) {
-                String albumName = info.get(0);
-                if (mediaLibrary.getAlbums().containsKey(albumName)) {
-                    MusicAlbum album = mediaLibrary.getAlbums().get(albumName);
-                    album.getSongs().add(song);
-                    song.setAlbum(album);
+            /* Library Items*/
+            MusicFile song;
+            MusicAlbum album;
+            MusicArtist artist;
+            MusicGenre genre;
+            /* MetaInfo */
+            /* Set Default Value */
+            String title = file.getName();
+            String albumTitle = "Unknown Album";
+            String artistName = "Unknown Artist";
+            String albumArtistName = "Unknown Album Artist";
+            String genreTitle = "Unknown Genre";
+            String releaseYear = "----";
+            String sampleRate  = "Unknown Sample Rate";
+            String bitRate = "Unknown Bit Rate";
+            Duration duration = Duration.UNKNOWN;
+            Image artwork = AppUtils.DEFAULT_ALBUM_ARTWORK;
+
+            if (mp3File.hasID3v2Tag()) {
+                AbstractID3v2Tag metaTag = mp3File.getID3v2Tag();
+                List<String> info;
+                info = metaTag.getAll(FieldKey.TITLE);
+                if (!info.isEmpty())
+                    title = info.get(0);
+                info = metaTag.getAll(FieldKey.ALBUM);
+                if (!info.isEmpty())
+                    albumTitle = info.get(0);
+                info = metaTag.getAll(FieldKey.ARTIST);
+                if (!info.isEmpty())
+                    artistName = info.get(0);
+                info = metaTag.getAll(FieldKey.ALBUM_ARTIST);
+                if (!info.isEmpty())
+                    albumArtistName = info.get(0);
+                info = metaTag.getAll(FieldKey.YEAR);
+                if (!info.isEmpty())
+                    releaseYear = info.get(0);
+                info = metaTag.getAll(FieldKey.GENRE);
+                if (!info.isEmpty())
+                    genreTitle = info.get(0);
+                Artwork artwk = metaTag.getFirstArtwork();
+                if (artwk != null && artwk.getBinaryData() != null)
+                    artwork = new Image(new ByteArrayInputStream(artwk.getBinaryData()));
+
+                MP3AudioHeader audioHeader = mp3File.getMP3AudioHeader();
+                if (audioHeader!=null) {
+                    bitRate = audioHeader.getBitRate() + "Kbps";
+                    sampleRate = (double)audioHeader.getSampleRateAsNumber()/1000 + "Khz";
+                    duration = Duration.seconds(audioHeader.getTrackLength());
                 }
-                else {
-                    Album album = createAlbum(mp3File);
-                    album.getSongs().add(song);
-                    mediaLibrary.getAlbums().put(albumName,album);
-                    song.setAlbum(album);
-                }
+
             }
 
-          /* *********HANDLE ARTIST************/
-            info = mp3File.getID3v2Tag().getAll(FieldKey.ARTIST);
-            if (!info.isEmpty() && info.get(0).trim().length() > 0) {
-                String artistName = info.get(0);
-                if (mediaLibrary.getArtists().containsKey(artistName)) {
-                    MusicArtist artist = mediaLibrary.getArtists().get(artistName);
-                    artist.getAllAlbums().add(song.getAlbum());
-                    song.setArtist(artist);
-                }
-                else {
-                    Artist artist = createArtist(mp3File);
-                    artist.getAllAlbums().add(song.getAlbum());
-                    song.setArtist(artist);
-                    mediaLibrary.getArtists().put(artistName,artist);
-                }
+            song = new Song(title,duration,bitRate,sampleRate,filepath);
+
+            if (mediaLibrary.getAlbums().containsKey(albumTitle)) {
+                album = mediaLibrary.getAlbums().get(albumTitle);
+                album.getSongs().add(song);
+                song.setAlbum(album);
             }
-            /* **HANDLE GENRE **/
-            info  = mp3File.getID3v2Tag().getAll(FieldKey.GENRE);
-            if (!info.isEmpty() && info.get(0).trim().length() > 0) {
-                String genreTitle = info.get(0);
-                if (mediaLibrary.getGenres().containsKey(genreTitle)) {
-                    MusicGenre genre = mediaLibrary.getGenres().get(genreTitle);
-                    genre.getSongs().add(song);
-                    song.setGenre(genre);
-                }
-                else {
-                    Genre genre = createGenre(mp3File);
-                    genre.getSongs().add(song);
-                    song.setGenre(genre);
-                    mediaLibrary.getGenres().put(genreTitle,genre);
-                }
+            else {
+                AlbumArtist albumArtist = new AlbumArtist(artistName);
+                album = new Album(albumTitle,releaseYear,albumArtist,artwork);
+                album.getSongs().add(song);
+                song.setAlbum(album);
+                mediaLibrary.getAlbums().put(albumTitle,album);
             }
 
-             mediaLibrary.getSongs().put(filepath,song);
-        } catch (IOException | TagException | ReadOnlyFileException | CannotReadException | InvalidAudioFrameException e) {
-            System.err.println("Error Occurred while reading metadata from " + filepath + ", it cant be added to media library");
-        }
-
-    }
-
-    private void removeFile(String path) {
-
-    }
-    private Song createSong(MP3File mp3File) {
-        String title = mp3File.getFile().getName();
-        String bitrate = "Unknown Bitrate";
-        String samplerate = "Unknown Sample Rate";
-        Duration duration = Duration.UNKNOWN;
-        String filelocation = mp3File.getFile().getAbsolutePath();
-        List<String> info;
-
-        // fetch the title
-
-        if (mp3File.hasID3v2Tag()) {
-            info = mp3File.getID3v2Tag().getAll(FieldKey.TITLE);
-            if (!info.isEmpty()) {
-                title = info.get(0);
+            if (mediaLibrary.getArtists().containsKey(artistName)) {
+                artist = mediaLibrary.getArtists().get(artistName);
+                artist.getAllAlbums().add(album);
+                song.setArtist(artist);
             }
-        }
-
-        MP3AudioHeader audioHeader = mp3File.getMP3AudioHeader();
-        if (audioHeader != null) {
-            bitrate = audioHeader.getBitRate() + "Kbps";
-            samplerate = (double)audioHeader.getSampleRateAsNumber()/1000 + "Khz";
-            duration = Duration.seconds(audioHeader.getTrackLength());
-        }
-        return new Song(title,duration,bitrate,samplerate,filelocation);
-    }
-
-    private Album createAlbum(MP3File mp3File) {
-        String albumTitle = "Unknown Album";
-        String releaseYear = "0000";
-        String albumArtist = "Unknown Album Artist";
-        Image artwork = AppUtils.DEFAULT_ALBUM_ARTWORK;
-
-        List<String> info;
-        if (mp3File.hasID3v2Tag()) {
-            info = mp3File.getID3v2Tag().getAll(FieldKey.ALBUM);
-            if (!info.isEmpty())
-                albumTitle = info.get(0);
-
-            info = mp3File.getID3v2Tag().getAll(FieldKey.YEAR);
-            if (!info.isEmpty())
-                releaseYear = info.get(0);
-
-            Artwork a = mp3File.getID3v2Tag().getFirstArtwork();
-            if (a!= null && a.getBinaryData()!=null) {
-                ByteArrayInputStream stream = new ByteArrayInputStream(a.getBinaryData());
-                artwork = new Image(stream);
+            else {
+                artist = new Artist(artistName);
+                artist.getAllAlbums().add(album);
+                song.setArtist(artist);
+                mediaLibrary.getArtists().put(artistName,artist);
             }
 
-            info = mp3File.getID3v2Tag().getAll(FieldKey.ALBUM_ARTIST);
-            if (!info.isEmpty())
-                albumArtist = info.get(0);
+            if (mediaLibrary.getGenres().containsKey(genreTitle)) {
+                genre = mediaLibrary.getGenres().get(genreTitle);
+                genre.getSongs().add(song);
+                song.setGenre(genre);
+            }
+            else {
+                genre = new Genre(genreTitle);
+                genre.getSongs().add(song);
+                song.setGenre(genre);
+                mediaLibrary.getGenres().put(genreTitle,genre);
+            }
+            mediaLibrary.getSongs().put(filepath,song);
         }
-
-        AlbumArtist album_artist = new AlbumArtist(albumArtist);
-        Album album = new Album(albumTitle,releaseYear,album_artist,artwork);
-        album_artist.getAlbums().add(album);
-        return album;
+        catch(IOException  | TagException | ReadOnlyFileException | CannotReadException | InvalidAudioFrameException io) {
+            System.err.println("Error while reading metadata from file. target file : " + filepath);
+        }
     }
 
-    private Artist createArtist(MP3File mp3File) {
-        String artistName = "Unknown Artist";
-        if (mp3File.hasID3v2Tag()) {
-            List<String> info = mp3File.getID3v2Tag().getAll(FieldKey.ARTIST);
-            if (!info.isEmpty())
-                artistName = info.get(0);
-        }
-        return new Artist(artistName);
-    }
 
-    private Genre createGenre(MP3File mp3File) {
-        String genreTitle = "Unknown Genre";
-        if (mp3File.hasID3v2Tag()) {
-            List<String> info = mp3File.getID3v2Tag().getAll(FieldKey.GENRE);
-            if (!info.isEmpty())
-                genreTitle = info.get(0);
-        }
-        return new Genre(genreTitle);
-    }
     @Override
     public Library getMediaLibrary() {
         return mediaLibrary;

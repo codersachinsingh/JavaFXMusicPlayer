@@ -7,7 +7,7 @@ import javafx.collections.ObservableList;
 public interface MusicGenre {
     ReadOnlyStringProperty genreTitleProperty();
     String getGenreTitle();
-    ObservableList<Song> getSongs();
+    ObservableList<MusicFile> getSongs();
     ReadOnlyIntegerProperty totalSongsProperty();
     int getTotalSongs();
 

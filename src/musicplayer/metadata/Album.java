@@ -8,7 +8,7 @@ import javafx.scene.image.Image;
 
 public class Album implements MusicAlbum {
     private ReadOnlyStringWrapper albumTitle;
-    private ObservableList<Song> songs;
+    private ObservableList<MusicFile> songs;
     private ReadOnlyIntegerWrapper totalSongs;
     private ReadOnlyStringWrapper albumReleaseYear;
     private ReadOnlyObjectWrapper<AlbumArtist> albumArtist;
@@ -37,7 +37,7 @@ public class Album implements MusicAlbum {
     }
 
     @Override
-    public ObservableList<Song> getSongs() {
+    public ObservableList<MusicFile> getSongs() {
         return songs;
     }
 

@@ -6,7 +6,7 @@ import javafx.collections.ObservableList;
 
 public class Genre implements MusicGenre {
     private ReadOnlyStringWrapper genreTitle;
-    private ObservableList<Song> songs = FXCollections.observableArrayList();
+    private ObservableList<MusicFile> songs = FXCollections.observableArrayList();
     private ReadOnlyIntegerWrapper totalSongs;
 
     public Genre(String title) {
@@ -25,7 +25,7 @@ public class Genre implements MusicGenre {
     }
 
     @Override
-    public ObservableList<Song> getSongs() {
+    public ObservableList<MusicFile> getSongs() {
         return songs;
     }
 
