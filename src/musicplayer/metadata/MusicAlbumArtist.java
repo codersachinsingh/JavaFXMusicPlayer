@@ -7,7 +7,7 @@ import javafx.collections.ObservableList;
 public interface MusicAlbumArtist {
     ReadOnlyStringProperty albumArtistNameProperty();
     String getAlbumArtistName();
-    ObservableList<Album> getAlbums();
+    ObservableList<MusicAlbum> getAlbums();
     ReadOnlyIntegerProperty totalAlbumsProperty();
     int getTotalAlbums();
 }

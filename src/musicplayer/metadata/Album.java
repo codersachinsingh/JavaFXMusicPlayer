@@ -1,6 +1,8 @@
 package musicplayer.metadata;
 
+import javafx.beans.Observable;
 import javafx.beans.property.*;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.image.Image;
 
@@ -8,9 +10,21 @@ public class Album implements MusicAlbum {
     private ReadOnlyStringWrapper albumTitle;
     private ObservableList<Song> songs;
     private ReadOnlyIntegerWrapper totalSongs;
-    private ReadOnlyIntegerWrapper albumReleaseYear;
+    private ReadOnlyStringWrapper albumReleaseYear;
     private ReadOnlyObjectWrapper<AlbumArtist> albumArtist;
     private ReadOnlyObjectWrapper<Image> albumArtwork;
+
+    public Album(String albumTitle, String albumReleaseYear,AlbumArtist albumArtist, Image albumArtwork) {
+        this.albumTitle = new ReadOnlyStringWrapper(this,"album title",albumTitle);
+        this.albumReleaseYear = new ReadOnlyStringWrapper(this,"album release year",albumReleaseYear);
+        this.albumArtwork = new ReadOnlyObjectWrapper<>(this,"artwork",albumArtwork);
+        this.totalSongs = new ReadOnlyIntegerWrapper(this,"total songs",0);
+        this.albumArtist = new ReadOnlyObjectWrapper<>(this,"album artist",albumArtist);
+        this.songs = FXCollections.observableArrayList();
+        this.songs.addListener(this::invalidated);
+    }
+
+
 
     @Override
     public ReadOnlyStringProperty albumNameProperty() {
@@ -37,8 +51,9 @@ public class Album implements MusicAlbum {
         return albumArtist.getValue();
     }
 
+
     @Override
-    public ReadOnlyIntegerProperty totoalSongsProperty() {
+    public ReadOnlyIntegerProperty totalSongsProperty() {
         return totalSongs.getReadOnlyProperty();
     }
 
@@ -48,12 +63,12 @@ public class Album implements MusicAlbum {
     }
 
     @Override
-    public ReadOnlyIntegerProperty albumReleaseYearProperty() {
+    public ReadOnlyStringProperty albumReleaseYearProperty() {
         return albumReleaseYear.getReadOnlyProperty();
     }
 
     @Override
-    public int getAlbumReleaseYear() {
+    public String getAlbumReleaseYear() {
         return albumReleaseYear.get();
     }
 
@@ -65,5 +80,15 @@ public class Album implements MusicAlbum {
     @Override
     public Image getAlbumArtwork() {
         return albumArtwork.getValue();
+    }
+
+    private void invalidated(Observable observable) {
+        totalSongs.set(songs.size());
+    }
+
+    @Override
+    public String toString() {
+        String str = albumTitle.get() +  "  [ Release Year : " + albumReleaseYear.get() + ", Total Songs : " + totalSongs.get() + "]";
+        return str;
     }
 }

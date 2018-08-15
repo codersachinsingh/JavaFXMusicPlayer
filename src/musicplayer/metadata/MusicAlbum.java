@@ -1,8 +1,6 @@
 package musicplayer.metadata;
 
-import javafx.beans.property.ReadOnlyIntegerProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.ReadOnlyStringProperty;
+import javafx.beans.property.*;
 import javafx.collections.ObservableList;
 import javafx.scene.image.Image;
 
@@ -12,10 +10,10 @@ public interface MusicAlbum {
     ObservableList<Song> getSongs();
     ReadOnlyObjectProperty<AlbumArtist> albumArtistProperty();
     AlbumArtist getAlbumArtist();
-    ReadOnlyIntegerProperty totoalSongsProperty();
+    ReadOnlyIntegerProperty totalSongsProperty();
     int getTotalSongs();
-    ReadOnlyIntegerProperty albumReleaseYearProperty();
-    int getAlbumReleaseYear();
+    ReadOnlyStringProperty albumReleaseYearProperty();
+    String getAlbumReleaseYear();
     ReadOnlyObjectProperty<Image> albumArtworkProperty();
     Image getAlbumArtwork();
 }

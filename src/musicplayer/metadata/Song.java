@@ -5,16 +5,37 @@ import javafx.util.Duration;
 
 public class Song implements MusicFile {
     private ReadOnlyStringWrapper title;
-    private ReadOnlyObjectWrapper<Album> album;
-    private ReadOnlyObjectWrapper<Artist> artist;
-    private ReadOnlyObjectWrapper<Genre> genre;
+    private ObjectProperty<MusicAlbum> album;
+    private ObjectProperty<MusicArtist> artist;
+    private ObjectProperty<MusicGenre> genre;
     private ReadOnlyObjectWrapper<Duration> duration;
-    private ReadOnlyIntegerWrapper bitrate;
-    private ReadOnlyDoubleWrapper sampleRate;
+    private ReadOnlyStringWrapper bitrate;
+    private ReadOnlyStringWrapper sampleRate;
     private ReadOnlyStringWrapper fileLocation;
     private BooleanProperty favorite;
-    public Song() {
 
+    @Override
+    public String toString() {
+        String str = "Title : " + title.get() + "\n" +
+                "Album : " + album.get() + "\n" +
+                "Artist : " + artist.get() + "\n" +
+                "Genre : " + genre.get() + "\n" +
+                "Bitrate : " + bitrate.get() + "\n" +
+                "Sample Rate : " + sampleRate.get() + "\n" +
+                "Location : " + fileLocation.get() + "\n";
+        return str;
+    }
+
+    public Song(String title, Duration duration, String bitrate, String sampleRate, String fileLocation) {
+        this.title = new ReadOnlyStringWrapper(this,"title",title);
+        this.duration = new ReadOnlyObjectWrapper<>(this,"duration",duration);
+        this.bitrate = new ReadOnlyStringWrapper(this,"bitrate",bitrate);
+        this.sampleRate = new ReadOnlyStringWrapper(this,"sample rate",sampleRate);
+        this.fileLocation = new ReadOnlyStringWrapper(this,"file location",fileLocation);
+        this.favorite = new SimpleBooleanProperty(false,"favorite",false);
+        this.album = new SimpleObjectProperty<>(this,"album",null);
+        this.artist = new SimpleObjectProperty<>(this,"artist",null);
+        this.genre = new SimpleObjectProperty<>(this,"genre",null);
     }
 
     @Override
@@ -28,35 +49,45 @@ public class Song implements MusicFile {
     }
 
     @Override
-    public ReadOnlyObjectProperty<Album> albumProperty() {
-        return album.getReadOnlyProperty();
+    public ObjectProperty<MusicAlbum> albumProperty() {
+        return album;
     }
 
     @Override
-    public Album getAlbum() {
+    public MusicAlbum getAlbum() {
         return album.getValue();
     }
 
     @Override
-    public ReadOnlyObjectProperty<Artist> artistProperty() {
-        return artist.getReadOnlyProperty();
+    public void setAlbum(MusicAlbum album) {
+        albumProperty().setValue(album);
+    }
+    @Override
+    public ObjectProperty<MusicArtist> artistProperty() {
+        return artist;
     }
 
     @Override
-    public Artist getArtist() {
+    public MusicArtist getArtist() {
         return artist.getValue();
     }
-
     @Override
-    public ReadOnlyObjectProperty<Genre> genreProperty() {
-        return genre.getReadOnlyProperty();
+    public void setArtist(MusicArtist artist) {
+        artistProperty().setValue(artist);
+    }
+    @Override
+    public ObjectProperty<MusicGenre> genreProperty() {
+        return genre;
     }
 
     @Override
-    public Genre getGenre() {
+    public MusicGenre getGenre() {
         return genre.getValue();
     }
-
+    @Override
+    public void setGenre(MusicGenre genre) {
+        genreProperty().setValue(genre);
+    }
     @Override
     public ReadOnlyObjectProperty<Duration> durationProperty() {
         return duration.getReadOnlyProperty();
@@ -68,22 +99,22 @@ public class Song implements MusicFile {
     }
 
     @Override
-    public ReadOnlyIntegerProperty bitrateProperty() {
+    public ReadOnlyStringProperty bitrateProperty() {
         return bitrate.getReadOnlyProperty();
     }
 
     @Override
-    public int getBitrate() {
+    public String getBitrate() {
         return bitrate.get();
     }
 
     @Override
-    public ReadOnlyDoubleProperty sampleRateProperty() {
+    public ReadOnlyStringProperty sampleRateProperty() {
         return sampleRate.getReadOnlyProperty();
     }
 
     @Override
-    public double getSampleRate() {
+    public String getSampleRate() {
         return sampleRate.getValue();
     }
 
@@ -111,6 +142,5 @@ public class Song implements MusicFile {
     public void setFavorite(boolean favorite) {
         this.favorite.set(favorite);
     }
-
 
 }

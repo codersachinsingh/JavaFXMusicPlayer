@@ -30,7 +30,8 @@ public class MediaFileScanner implements MediaScanner {
 		mediaLocator.getMediaScanLocations().addListener(this::MediaLocationsChangeHandler);
 		allowedExtensions.addListener(this::ExtensionsSetChangeLitsener);
 	}
-	public ObservableMap<String, List<String>> getmediaFiles() {
+	@Override
+	public ObservableMap<String, List<String>> getMediaFiles() {
 		return mediaFiles;
 	}
 	
@@ -68,9 +69,7 @@ public class MediaFileScanner implements MediaScanner {
 	public ObservableSet<String> getMediaScanLocations() {return mediaLocator.getMediaScanLocations();}
 
 	private void refresh() {
-		Iterator<String> iterator = mediaLocator.getMediaScanLocations().iterator();
-		while(iterator.hasNext()) {
-			String key = iterator.next();
+		for (String key : mediaLocator.getMediaScanLocations()) {
 			mediaFiles.put(key, scanDirectoryForMedia(key));
 		}
 	}
