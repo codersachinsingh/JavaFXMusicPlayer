@@ -34,7 +34,7 @@ public class MediaFileScanner implements MediaScanner {
 	public ObservableMap<String, List<String>> getMediaFiles() {
 		return mediaFiles;
 	}
-	
+	@Override
 	public List<String> getAllMediaFiles() {
 		List<String> list = new ArrayList<>();
 		for (String s : mediaFiles.keySet()) {

@@ -1,19 +1,15 @@
 package musicplayer.metadata;
 
-import javafx.beans.property.*;
-import javafx.collections.ObservableList;
+import java.util.List;
+
 import javafx.scene.image.Image;
 
 public interface MusicAlbum {
-    ReadOnlyStringProperty albumNameProperty();
-    String getAlbumName();
-    ObservableList<MusicFile> getSongs();
-    ReadOnlyObjectProperty<AlbumArtist> albumArtistProperty();
-    AlbumArtist getAlbumArtist();
-    ReadOnlyIntegerProperty totalSongsProperty();
-    int getTotalSongs();
-    ReadOnlyStringProperty albumReleaseYearProperty();
-    String getAlbumReleaseYear();
-    ReadOnlyObjectProperty<Image> albumArtworkProperty();
-    Image getAlbumArtwork();
+	List<MusicFile> getSongs();
+	String getAlbumTitle();
+	String getArtworkLocation();
+	Image getAlbumArtwork();
+	String getReleaseYear();
+	String getAlbumArtist();
+	int getTotalSongs();
 }

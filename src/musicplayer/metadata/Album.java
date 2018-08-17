@@ -1,94 +1,86 @@
 package musicplayer.metadata;
 
-import javafx.beans.Observable;
-import javafx.beans.property.*;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.sun.javafx.embed.swing.Disposer;
+
 import javafx.scene.image.Image;
+import musicplayer.util.AppUtils;
 
 public class Album implements MusicAlbum {
-    private ReadOnlyStringWrapper albumTitle;
-    private ObservableList<MusicFile> songs;
-    private ReadOnlyIntegerWrapper totalSongs;
-    private ReadOnlyStringWrapper albumReleaseYear;
-    private ReadOnlyObjectWrapper<AlbumArtist> albumArtist;
-    private ReadOnlyObjectWrapper<Image> albumArtwork;
+	private String title;
+	private List<MusicFile> songs;
+	private String releaseYear;
+	private String albumArtist;
+	private String artworkLocation;
+	private Image artwork;
+	public Album(String title ,String releaseYear, String albumArtist,String artwork) {
+		this.title = title;
+		this.releaseYear = releaseYear;
+		this.albumArtist = albumArtist;
+		this.artworkLocation = artwork;
+	}
 
-    public Album(String albumTitle, String albumReleaseYear,AlbumArtist albumArtist, Image albumArtwork) {
-        this.albumTitle = new ReadOnlyStringWrapper(this,"album title",albumTitle);
-        this.albumReleaseYear = new ReadOnlyStringWrapper(this,"album release year",albumReleaseYear);
-        this.albumArtwork = new ReadOnlyObjectWrapper<>(this,"artwork",albumArtwork);
-        this.totalSongs = new ReadOnlyIntegerWrapper(this,"total songs",0);
-        this.albumArtist = new ReadOnlyObjectWrapper<>(this,"album artist",albumArtist);
-        this.songs = FXCollections.observableArrayList();
-        this.songs.addListener(this::invalidated);
-    }
+	@Override
+	public List<MusicFile> getSongs() {
+		if (songs == null)
+			return new ArrayList<>();
+		return songs;
+	}
 
+	@Override
+	public String getArtworkLocation() {
+		return artworkLocation;
+	}
 
+	@Override
+	public String getReleaseYear() {
+		return releaseYear;
+	}
 
-    @Override
-    public ReadOnlyStringProperty albumNameProperty() {
-        return albumTitle.getReadOnlyProperty();
-    }
+	@Override
+	public String getAlbumArtist() {
+		return albumArtist;
+	}
 
-    @Override
-    public String getAlbumName() {
-        return albumTitle.getValue();
-    }
+	@Override
+	public int getTotalSongs() {
+		if (songs != null)
+			return songs.size();
+		else
+			return 0;
+	}
 
-    @Override
-    public ObservableList<MusicFile> getSongs() {
-        return songs;
-    }
-
-    @Override
-    public ReadOnlyObjectProperty<AlbumArtist> albumArtistProperty() {
-        return albumArtist.getReadOnlyProperty();
-    }
-
-    @Override
-    public AlbumArtist getAlbumArtist() {
-        return albumArtist.getValue();
-    }
-
-
-    @Override
-    public ReadOnlyIntegerProperty totalSongsProperty() {
-        return totalSongs.getReadOnlyProperty();
-    }
-
-    @Override
-    public int getTotalSongs() {
-        return totalSongs.get();
-    }
-
-    @Override
-    public ReadOnlyStringProperty albumReleaseYearProperty() {
-        return albumReleaseYear.getReadOnlyProperty();
-    }
-
-    @Override
-    public String getAlbumReleaseYear() {
-        return albumReleaseYear.get();
-    }
-
-    @Override
-    public ReadOnlyObjectProperty<Image> albumArtworkProperty() {
-        return albumArtwork.getReadOnlyProperty();
-    }
-
-    @Override
-    public Image getAlbumArtwork() {
-        return albumArtwork.getValue();
-    }
-
-    private void invalidated(Observable observable) {
-        totalSongs.set(songs.size());
-    }
-
-    @Override
-    public String toString() {
-        String str = albumTitle.get() +  "  [ Release Year : " + albumReleaseYear.get() + ", Total Songs : " + totalSongs.get() + "]";
-        return str;
-    }
+	@Override
+	public String getAlbumTitle() {
+		return title;
+	}
+	@Override
+	public Image getAlbumArtwork() {
+		if (artwork == null) {
+			File artworkfile = new File(AppUtils.AlbumArtworkFolder(),title + ".jpg");
+			if (artworkfile.exists()) {
+				try {
+					artwork = new Image(new FileInputStream(artworkfile));
+				} catch (FileNotFoundException e) {
+					artwork = AppUtils.DEFAULT_ALBUM_ARTWORK;
+				}
+				return artwork;
+			}
+		}
+		return artwork;
+	}
+	
+	public void disposeAlbumArtwork() {
+		artwork = null;
+	}
+	@Override
+	public String toString() {
+		return title + "[Release Date : " + releaseYear + " , Album Artist : " + albumArtist + "]";
+	}
+	
 }

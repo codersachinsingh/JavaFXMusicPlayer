@@ -1,5 +1,8 @@
 package musicplayer.metadata;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.beans.Observable;
 import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.property.ReadOnlyIntegerWrapper;
@@ -10,44 +13,35 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 public class Artist implements MusicArtist {
-    private ReadOnlyStringWrapper artistName;
-    private ObservableList<MusicAlbum> albums = FXCollections.observableArrayList();
-    private ReadOnlyIntegerWrapper totalAlbums;
+	private List<MusicAlbum> albums;
+	private String artistName;
+	
+	public Artist(String artist) {
+		this.artistName = artist;
+	}
+	@Override
+	public String getArtistName() {
+		return artistName;
+	}
 
-    public Artist(String artistName) {
-        this.artistName = new ReadOnlyStringWrapper(this,"artist",artistName);
-        albums.addListener(this::invalidated);
-        totalAlbums = new ReadOnlyIntegerWrapper(this,"total albums",0);
-    }
+	@Override
+	public List<MusicAlbum> getAlbums() {
+		if (albums == null)
+			albums = new ArrayList<>();
+		return albums;
+	}
 
-    @Override
-    public ReadOnlyStringProperty artistNameProperty() {
-        return artistName.getReadOnlyProperty();
-    }
-
-    @Override
-    public String getArtistName() {
-        return artistName.getValue();
-    }
-
-    @Override
-    public ObservableList<MusicAlbum> getAllAlbums() {
-        return albums;
-    }
-
-    @Override
-    public ReadOnlyIntegerProperty totalAlbumsProperty() {
-        return totalAlbums.getReadOnlyProperty();
-    }
-
-    @Override
-    public int getTotalAlbums() {
-        return totalAlbums.get();
-    }
-
-    private void invalidated(Observable litserner) {
-        totalAlbums.set(albums.size());
-    }
-
+	@Override
+	public int getTotalAlbums() {
+		if (albums != null)
+			return albums.size();
+		else
+			return 0;
+	}
+    
+	@Override
+	public String toString() {
+		return "Artist : " + artistName;
+	}
 
 }

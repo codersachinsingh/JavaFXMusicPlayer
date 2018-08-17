@@ -11,6 +11,7 @@ public interface MediaScanner {
 	ObservableMap<String,List<String>> getMediaFiles();
 	void addAllowedExtension(String extension);
 	void removeAllowedExtention(String extension);
+	List<String> getAllMediaFiles();
 	Iterator<String> getAllowedExtensions();
 	MediaLocator getMediaLocator();
 }
