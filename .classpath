@@ -3,5 +3,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="C:/Users/admin/Jar&apos;s/Java Media LIBs/JAudioTagger/jaudiotagger-2.2.6-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="C:/Users/admin/Jar&apos;s/Controlsrx/controlsfx-8.40.12.jar"/>
+	<classpathentry kind="con" path="org.eclipse.fx.ide.jdt.core.JAVAFX_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

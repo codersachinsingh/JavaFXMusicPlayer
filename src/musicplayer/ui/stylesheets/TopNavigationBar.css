@@ -1,0 +1,38 @@
+#root {
+	-fx-background-color : tomato;
+}
+
+#nowPlaying {
+	-fx-background-color:rgb(107,9,239);
+	-fx-text-fill: white;
+	-fx-font-weight: bold;
+	-fx-font-size: 15;
+}
+#nowPlaying:hover {
+	-fx-background-color:rgb(26,0,104)
+}
+#playLists {
+	-fx-background-color:rgb(0,109,251);
+}
+#playLists:hover {
+	-fx-background-color:rgb(51,0,51);
+}
+.button {
+	-fx-background-color:darkcyan;
+	-fx-text-fill:white;
+	-fx-font-weight:bold;
+	-fx-font-size:12;
+}
+
+.button:hover {
+	-fx-background-color:rgb(26,77,77)
+}
+
+#searchbar {
+	-fx-background-radius:50;
+	-fx-background-repeat:no-repeat;
+	-fx-background-position: right;
+	-fx-background-insets: -2;
+	-fx-background-image: url("../../../icons/search.png"); 
+	-fx-prompt-text-fill: rgb(77,128,128);
+}

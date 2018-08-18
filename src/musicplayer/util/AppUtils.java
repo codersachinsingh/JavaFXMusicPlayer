@@ -2,6 +2,7 @@ package musicplayer.util;
 
 import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 import java.io.File;
 
@@ -25,5 +26,13 @@ public class AppUtils {
                 System.out.println("Directories created successfully");
         }
         return artworkDir;
+    }
+    
+    public static ImageView getImageView(String url , int width , int height) {
+    	Image image = new Image(url);
+    	ImageView imageView = new ImageView(image);
+    	imageView.setFitHeight(height);
+    	imageView.setFitWidth(width);
+    	return imageView;
     }
 }
