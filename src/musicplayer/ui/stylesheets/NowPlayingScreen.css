@@ -1,0 +1,18 @@
+.slider .track {
+	-fx-background: null;
+}
+
+.progress-bar .bar {
+	-fx-background-insets: 0;
+	-fx-padding:4;
+}
+
+#playerProgressBar .bar {
+	-fx-background-color:rgb(77,51,153);
+}
+
+#volProgressBar .bar {
+	-fx-background-color : rgb(179,26,26);
+}
+
+

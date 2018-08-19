@@ -5,8 +5,11 @@ import java.io.IOException;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 
 public class MainController {
+	@FXML
+	private BorderPane root;
 	@FXML
 	private AnchorPane bottomBar;
 	@FXML
@@ -16,7 +19,9 @@ public class MainController {
 	@FXML
 	private TopNavigationBarController topBarController;
 	@FXML
-	private AnchorPane centerSpace;
+	private AnchorPane centerScreens;
+	@FXML
+	private CenterScreensController centerScreensController;
 	
 	public void initialize() {
 		System.out.println("MainController");
@@ -25,9 +30,12 @@ public class MainController {
 		
 		try {
 			AnchorPane screen = loader.load();
-			screen.prefHeightProperty().bind(centerSpace.prefHeightProperty());
-			screen.prefWidthProperty().bind(centerSpace.prefWidthProperty());
-			centerSpace.getChildren().add(screen);
+			centerScreens.getChildren().add(screen);
+			AnchorPane.setTopAnchor(screen, 0.0);
+			AnchorPane.setBottomAnchor(screen, 0.0);
+			AnchorPane.setRightAnchor(screen, 0.0);
+			AnchorPane.setLeftAnchor(screen, 0.0);
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
