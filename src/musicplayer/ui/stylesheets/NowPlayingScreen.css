@@ -15,4 +15,15 @@
 	-fx-background-color : rgb(179,26,26);
 }
 
+.button {
+	-fx-background-radius:0;
+	-fx-border-radius:0;
+}
 
+#root {
+	-fx-background-color: rgb(35,24,24);
+}
+
+#bottomAnchorPane {
+	-fx-background-color:bisque ;
+}

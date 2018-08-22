@@ -3,6 +3,7 @@ package musicplayer.util;
 import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.util.Duration;
 
 import java.io.File;
 
@@ -35,4 +36,26 @@ public class AppUtils {
     	imageView.setFitWidth(width);
     	return imageView;
     }
+    
+    public static String formatTime(Duration duration) {
+		int seconds = (int)duration.toSeconds();
+		if (seconds >= 60) {
+			int minutes;
+			minutes = seconds/60;
+			seconds = seconds%60;
+			if (minutes >= 60) {
+				int hours;
+				hours = minutes/60;
+				minutes = minutes%60;
+				return String.format("%d:%02d:%02d", hours,minutes,seconds);
+			}
+			else {
+				return String.format("%d:%02d:%02d",0,minutes,seconds);
+			}
+			
+		}
+		else {
+			return String.format("%d:%02d:%02d", 0,0,seconds);
+		}
+	}
 }

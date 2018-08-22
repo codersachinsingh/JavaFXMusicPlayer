@@ -41,6 +41,6 @@ public class MainController {
 			e.printStackTrace();
 		}
 		
-		
+		root.setBottom(null);
 	}
 }
