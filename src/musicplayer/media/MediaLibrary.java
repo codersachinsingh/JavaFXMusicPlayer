@@ -5,6 +5,7 @@ import javafx.beans.Observable;
 import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.property.ReadOnlyIntegerWrapper;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import musicplayer.metadata.*;
 
@@ -33,7 +34,8 @@ public class MediaLibrary implements Library {
     public ObservableMap<String, MusicFile> getSongs() {
         return songs;
     }
-
+    
+    
     public ObservableMap<String, MusicAlbum> getAlbums() {
         return albums;
     }
@@ -65,4 +67,36 @@ public class MediaLibrary implements Library {
     public ReadOnlyIntegerProperty getTotalGenres() {
         return totalGenres.getReadOnlyProperty();
     }
+
+	@Override
+	public ObservableList<MusicFile> getAllSongs() {
+		ObservableList<MusicFile> allsongs = FXCollections.observableArrayList();
+		for (String key : songs.keySet())
+				allsongs.add(songs.get(key));
+		return allsongs.sorted();
+	}
+
+	@Override
+	public ObservableList<MusicAlbum> getAllAlbums() {
+		ObservableList<MusicAlbum> allAlbums = FXCollections.observableArrayList();
+		for (String key : albums.keySet())
+				allAlbums.add(albums.get(key));
+		return allAlbums.sorted();
+	}
+
+	@Override
+	public ObservableList<MusicArtist> getAllArtists() {
+		ObservableList<MusicArtist> allArtists = FXCollections.observableArrayList();
+		for (String key : artists.keySet())
+				allArtists.add(artists.get(key));
+		return allArtists.sorted();
+	}
+
+	@Override
+	public ObservableList<MusicGenre> getAllGenres() {
+		ObservableList<MusicGenre> allgenre = FXCollections.observableArrayList();
+		for (String key : genres.keySet())
+				allgenre.add(genres.get(key));
+		return allgenre.sorted();
+	}
 }

@@ -9,6 +9,7 @@ public interface MusicAlbum {
 	String getAlbumTitle();
 	String getArtworkLocation();
 	Image getAlbumArtwork();
+	Image getAlbumArtwork(int width , int height);
 	String getReleaseYear();
 	String getAlbumArtist();
 	int getTotalSongs();

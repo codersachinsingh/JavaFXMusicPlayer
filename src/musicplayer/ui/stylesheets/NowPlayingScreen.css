@@ -1,5 +1,5 @@
 .slider .track {
-	-fx-background: null;
+	-fx-background-color: null;
 }
 
 .progress-bar .bar {
@@ -24,6 +24,9 @@
 	-fx-background-color: rgb(35,24,24);
 }
 
+#metadataPane .button {
+	-fx-background-color:rgb(35,24,24);
+}
 #bottomAnchorPane {
 	-fx-background-color:bisque ;
 }

@@ -17,7 +17,6 @@ public class Album implements MusicAlbum {
 	private String releaseYear;
 	private String albumArtist;
 	private String artworkLocation;
-	private Image artwork;
 	public Album(String title ,String releaseYear, String albumArtist,String artwork) {
 		this.title = title;
 		this.releaseYear = releaseYear;
@@ -61,7 +60,7 @@ public class Album implements MusicAlbum {
 	}
 	@Override
 	public Image getAlbumArtwork() {
-		if (artwork == null) {
+		Image artwork = null;
 			File artworkfile = new File(AppUtils.AlbumArtworkFolder(),title + ".jpg");
 			if (artworkfile.exists()) {
 				try {
@@ -69,14 +68,26 @@ public class Album implements MusicAlbum {
 				} catch (FileNotFoundException e) {
 					artwork = AppUtils.DEFAULT_ALBUM_ARTWORK;
 				}
-				return artwork;
+				
 			}
-		}
-		return artwork;
+			return artwork;
 	}
-	
-	public void disposeAlbumArtwork() {
-		artwork = null;
+	@Override
+	public Image getAlbumArtwork(int width , int height) {
+		Image artwork = null;
+			File artworkfile = new File(AppUtils.AlbumArtworkFolder(),title + ".jpg");
+			if (artworkfile.exists()) {
+				try {
+					artwork = new Image(new FileInputStream(artworkfile),width,height,true,true);
+				} catch (FileNotFoundException e) {
+					artwork = AppUtils.DEFAULT_ALBUM_ARTWORK;
+				}
+				
+			}
+			else {
+				artwork = AppUtils.DEFAULT_ALBUM_ARTWORK;
+			}
+			return artwork;
 	}
 	@Override
 	public String toString() {

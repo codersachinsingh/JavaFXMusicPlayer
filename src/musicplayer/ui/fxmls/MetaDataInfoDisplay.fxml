@@ -5,9 +5,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="300.0" prefWidth="500.0" style="-fx-background-color: rgb(35,24,30);" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="musicplayer.ui.fxmls.MetaDataInfoDisplayController">
+<VBox fx:id="vbox" alignment="CENTER_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="300.0" prefWidth="500.0" stylesheets="@../stylesheets/MetaDataInfoDisplay.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="musicplayer.ui.fxmls.MetaDataInfoDisplayController">
    <children>
-      <Label fx:id="title" focusTraversable="false" graphicTextGap="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="50.0" prefWidth="300.0" text="Tu Jane Na - Atif Alsam" textFill="WHITE" textOverrun="WORD_ELLIPSIS">
+      <Label fx:id="title" focusTraversable="false" graphicTextGap="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="40.0" minWidth="260.0" prefHeight="50.0" prefWidth="300.0" text="Tu Jane Na - Atif Alsam" textFill="WHITE" textOverrun="WORD_ELLIPSIS">
          <font>
             <Font name="Consolas" size="26.0" />
          </font>
@@ -18,7 +18,7 @@
             <Insets left="30.0" />
          </padding>
       </Label>
-      <Label fx:id="artist" graphicTextGap="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="50.0" prefWidth="500.0" text="Ajab Prem Ki Ghazab Kahani" textFill="WHITE" textOverrun="WORD_ELLIPSIS">
+      <Label fx:id="artist" graphicTextGap="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="40.0" minWidth="260.0" prefHeight="50.0" prefWidth="500.0" text="Ajab Prem Ki Ghazab Kahani" textFill="WHITE" textOverrun="WORD_ELLIPSIS">
          <font>
             <Font name="Segoe UI" size="20.0" />
          </font>
@@ -29,7 +29,7 @@
             <Insets left="10.0" />
          </VBox.margin>
       </Label>
-      <Label fx:id="album" graphicTextGap="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="50.0" prefWidth="500.0" text="Ajab Prem Ki Ghazab Kahani" textFill="WHITE" textOverrun="WORD_ELLIPSIS">
+      <Label fx:id="album" graphicTextGap="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="40.0" minWidth="260.0" prefHeight="50.0" prefWidth="500.0" text="Ajab Prem Ki Ghazab Kahani" textFill="WHITE" textOverrun="WORD_ELLIPSIS">
          <font>
             <Font name="Segoe UI" size="20.0" />
          </font>
@@ -40,7 +40,7 @@
             <Insets left="30.0" />
          </padding>
       </Label>
-      <Label fx:id="genre_year" graphicTextGap="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="50.0" prefWidth="500.0" text="Bollywood Music - 2009" textFill="WHITE">
+      <Label fx:id="genre_year" graphicTextGap="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="40.0" minWidth="260.0" prefHeight="50.0" prefWidth="500.0" text="Bollywood Music - 2009" textFill="WHITE">
          <font>
             <Font size="15.0" />
          </font>
@@ -60,4 +60,7 @@
          </VBox.margin>
       </Label>
    </children>
+   <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+   </padding>
 </VBox>

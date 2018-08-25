@@ -90,7 +90,10 @@
                   <Button fx:id="nextScreen" focusTraversable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" opacity="0.76" prefHeight="25.0" prefWidth="25.0" />
                </children>
             </HBox>
-            <AnchorPane fx:id="screen" layoutY="7.0" prefHeight="200.0" prefWidth="300.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+            <AnchorPane fx:id="screen" layoutY="7.0" prefHeight="200.0" prefWidth="300.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding></AnchorPane>
          </children>
       </AnchorPane>
    </children>

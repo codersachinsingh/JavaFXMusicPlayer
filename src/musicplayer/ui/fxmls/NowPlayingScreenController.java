@@ -3,6 +3,8 @@ package musicplayer.ui.fxmls;
 import java.io.File;
 import java.io.IOException;
 
+import org.jaudiotagger.audio.mp4.atom.Mp4HdlrBox.MediaDataType;
+
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -88,28 +90,6 @@ public class NowPlayingScreenController {
 	private boolean atEndofMedia = false;
 	private boolean stoprequested = false;
 	
-	public void setMetaData(ObservableMap<String, Object> metadata , String filename) {
-		// setting the album art
-		Image image = (Image) metadata.get("image");
-		if (image != null) {
-			bigAlbumArt.setImage(image);
-		}
-		else {
-			bigAlbumArt.setImage(AppUtils.DEFAULT_ALBUM_ARTWORK);
-		}
-		
-		String title = (String) metadata.get("title");
-		mdidController.titleArtistText().setValue(title);
-		String artist = (String) metadata.get("artist");
-		mdidController.artistText().setValue(artist);
-		String album = (String) metadata.get("album");
-		mdidController.albumText().setValue(album);
-		String genre = (String) metadata.get("genre");
-		Integer year = (Integer) metadata.get("year");
-		mdidController.genreYearText().setValue(genre + " - " + year);
-		
-	}
-	
 	private void setIcons() {
 		ClassLoader cl = getClass().getClassLoader();
 		playPauseBtn.setGraphic(AppUtils.getImageView(cl.getResource("icons/play_circle.png").toExternalForm(), 40, 40));
@@ -151,6 +131,8 @@ public class NowPlayingScreenController {
 		playerProgressBar.progressProperty().bind(playerSlider.valueProperty().divide(100.0));
 		volProgressBar.progressProperty().bind(volSlider.valueProperty().divide(100.0));
 		
+		playerSlider.setVisible(false);
+		
 		bigAlbumArt.fitWidthProperty().bind(bigAlbumArt.fitHeightProperty());
 		bigAlbumArt.fitHeightProperty().bind(root.heightProperty().subtract(140));
 		metadataPane.prefWidthProperty().bind(Bindings.createDoubleBinding(()->(root.getWidth()-bigAlbumArt.getFitWidth()-100.0), root.widthProperty() , bigAlbumArt.fitWidthProperty()));
@@ -174,6 +156,7 @@ public class NowPlayingScreenController {
 			value = value * 2;
 			speakerVolPersentage.setText(value+"%");
 		});
+		
 		volSlider.valueProperty().addListener((e)-> {
 			double currentValue = volSlider.getValue();
 			if (currentValue > 0 && currentValue <= 30) {
@@ -200,8 +183,17 @@ public class NowPlayingScreenController {
 			double sum = changeFactor + currentValue;
 			if (sum >= 0.0 || sum <= 100.0) {
 				volSlider.setValue(sum);
+				
+				if (mediaplayer != null) mediaplayer.setVolume(sum/100.0);
 			}
-		});;
+		});
+		
+		
+		repeat.addListener((e)-> {
+			if (mediaplayer != null) {
+				mediaplayer.setCycleCount(repeat.get()?MediaPlayer.INDEFINITE:1);
+			}
+		});
 		
 	}
 	public void initialize() {
@@ -212,99 +204,145 @@ public class NowPlayingScreenController {
 		Image image = new Image(file.toURI().toString());
 		
 		Media media = new Media(new File("D:\\My Media\\Test\\song.mp3").toURI().toString());
-		setMediaPlayer(new MediaPlayer(media));
+		MediaPlayer m = new MediaPlayer(media);
+		m.setOnReady(()-> {
+			setMediaPlayer(m);
+		});
 		
 	}
 	
-	public void setMediaPlayer(MediaPlayer mediaPlayer) {
-		this.mediaplayer = mediaPlayer;
-		if (mediaPlayer != null) {
-			mediaPlayer.setOnReady(()-> {
-				duration = mediaplayer.getMedia().getDuration();
-				readyThePlayer();
-				setMetaData(mediaPlayer.getMedia().getMetadata(), "fdosi");
-				updateValues();
-				
-			});
+	public void setMediaPlayer(MediaPlayer mp) {
+		this.mediaplayer = mp;
+		if (!playerSlider.isVisible())
+			playerSlider.setVisible(true);
+		duration = mediaplayer.getMedia().getDuration();
+		if (duration != Duration.UNKNOWN) {
+			totalTimeLbl.setText(AppUtils.formatTime(duration));
 		}
-	}
-	
-	private void readyThePlayer() {
 		playPauseBtn.setOnAction((event)-> {
 			Status status = mediaplayer.getStatus();
 			if (status == Status.UNKNOWN || status == Status.HALTED) {
-				return;
-			}
-			if (status == Status.PAUSED || status == Status.READY || status == Status.STOPPED) {
-				if (atEndofMedia) {
-					mediaplayer.seek(mediaplayer.getStartTime());
-					atEndofMedia = false;
-				}
-				mediaplayer.play();
+				
 			}
 			else {
-				mediaplayer.pause();
+				if (status == Status.PAUSED || status == status.STOPPED || status == status.READY) {
+					mediaplayer.play();
+					updateControlValues();
+					mediaplayer.currentTimeProperty().addListener((e)-> {
+						updateControlValues();
+					});
+					playPauseBtn.setGraphic(AppUtils.getImageView(getClass().getClassLoader().getResource("icons/pause_circle.png").toExternalForm(), 40, 40));
+				}
+				else {
+					mediaplayer.pause();
+					updateControlValues();
+					playPauseBtn.setGraphic(AppUtils.getImageView(getClass().getClassLoader().getResource("icons/play_circle.png").toExternalForm(), 40, 40));
+				}
 			}
-			
+		});
+		
+		playerSlider.setOnMouseClicked((event)-> {
+			playerSlider.setValueChanging(true);
+			double value = (event.getX()/playerSlider.getWidth()) * playerSlider.getMax();
+			playerSlider.setValue(value);
+			if (playerSlider.isValueChanging()) {
+				mediaplayer.seek(duration.multiply(playerSlider.getValue()/100.0));
+				updateControlValues();
+			}
+			playerSlider.setValueChanging(false);
 		});
 		
 		stopBtn.setOnAction((event)-> {
-			mediaplayer.stop();
-		});
-		
-		mediaplayer.currentTimeProperty().addListener((event)-> {
-			updateValues();
-		});
-		
-		mediaplayer.setOnPlaying(()-> {
-			if (stoprequested) {
-				mediaplayer.pause();
-				stoprequested = false;
+			if (mediaplayer.getStatus() == Status.PLAYING || mediaplayer.getStatus() == Status.STALLED || mediaplayer.getStatus() == Status.PAUSED) {
+				mediaplayer.stop();
+				playPauseBtn.setGraphic(AppUtils.getImageView(getClass().getClassLoader().getResource("icons/play_circle.png").toExternalForm(), 40, 40));
+				updateControlValues();
+				
 			}
-			else {
-				playPauseBtn.setGraphic(AppUtils.getImageView(getClass().getClassLoader().getResource("icons/pause_circle.png").toExternalForm(), 40, 40));
-			}
-			
 		});
 		
-		mediaplayer.setOnPaused(()-> {
-			System.out.println("on paused");
-			playPauseBtn.setGraphic(AppUtils.getImageView(getClass().getClassLoader().getResource("icons/play_circle.png").toExternalForm(), 40, 40));
+		mediaplayer.currentTimeProperty().addListener((e)-> {
+			updateControlValues();
 		});
+		playerSlider.valueProperty().addListener((e)-> {
+			if (playerSlider.isValueChanging()) {
+				mediaplayer.seek(duration.multiply(playerSlider.getValue()/100.0));
+				updateControlValues();
+			}
+		});
+		
+		volSlider.valueProperty().addListener((e)-> {
+			if (volSlider.isValueChanging()) {
+				mediaplayer.setVolume(volSlider.getValue()/100.0);
+			}
+		});
+		
 		
 		mediaplayer.setCycleCount(repeat.get()?MediaPlayer.INDEFINITE:1);
+		mediaplayer.setOnPlaying(()-> {
+			playPauseBtn.setGraphic(AppUtils.getImageView(getClass().getClassLoader().getResource("icons/pause_circle.png").toExternalForm(), 40, 40));
+		});
+		mediaplayer.setOnPaused(()-> {
+			playPauseBtn.setGraphic(AppUtils.getImageView(getClass().getClassLoader().getResource("icons/play_circle.png").toExternalForm(), 40, 40));
+		});
 		mediaplayer.setOnEndOfMedia(()-> {
 			if (!repeat.get()) {
 				playPauseBtn.setGraphic(AppUtils.getImageView(getClass().getClassLoader().getResource("icons/play_circle.png").toExternalForm(), 40, 40));
-				stoprequested = true;
+				playerSlider.setValue(0.0);
 				atEndofMedia = true;
+				// request next track.
 			}
 		});
-		
-		playerSlider.valueProperty().addListener((value)-> {
-			if (playerSlider.isValueChanging()) {
-				mediaplayer.seek(duration.multiply(playerSlider.getValue()/100.0));
-			}
-		});
-		
-		volSlider.valueProperty().addListener((value)-> {
-			mediaplayer.setVolume(volSlider.getValue()/100.0);
-		});
+		setMetaData(mediaplayer.getMedia().getMetadata(),mediaplayer.getMedia().getSource());
+		updateControlValues();
 		
 	}
-	private void updateValues() {
+	
+	private void updateControlValues() {
 		Platform.runLater(()-> {
 			Duration currentTime = mediaplayer.getCurrentTime();
 			currentTimeLbl.setText(AppUtils.formatTime(currentTime));
-			totalTimeLbl.setText(AppUtils.formatTime(duration));
-			playerSlider.setDisable(duration.isUnknown());
-			if (!playerSlider.isDisabled() && duration.greaterThan(Duration.ZERO) && !playerSlider.isValueChanging()) {
-				playerSlider.setValue(currentTime.divide(duration).toMillis() * 100.0);
+			playerSlider.setVisible(!duration.isUnknown());
+			if (playerSlider.isVisible() && duration.greaterThan(Duration.ZERO) && !playerSlider.isValueChanging()) {
+				playerSlider.setValue(currentTime.divide(duration).toMillis()*100.0);
 			}
+			
 			if (!volSlider.isValueChanging()) {
-				volSlider.setValue((int)Math.round(mediaplayer.getVolume() * 100.0));
+				volSlider.setValue(mediaplayer.getVolume() * 100);
 			}
-				
 		});
 	}
+	
+	public void setMetaData(ObservableMap<String, Object> metadata , String mediaSource) {
+		// setting the album art
+		Image image = (Image) metadata.get("image");
+		if (image != null) {
+			bigAlbumArt.setImage(image);
+		}
+		else {
+			bigAlbumArt.setImage(AppUtils.DEFAULT_ALBUM_ARTWORK);
+		}
+		
+		String title = (String) metadata.get("title");
+		if (title == null)
+			title = mediaSource;
+		mdidController.titleArtistText().setValue(title);
+		String artist = (String) metadata.get("artist");
+		if (artist == null)
+			artist = "No Info";
+		mdidController.artistText().setValue(artist);
+		String album = (String) metadata.get("album");
+		if (album == null)
+			album = "No Info";
+		mdidController.albumText().setValue(album);
+		String genre = (String) metadata.get("genre");
+		if (genre == null)
+			genre = "Unknown";
+		Integer year = (Integer) metadata.get("year");
+		if (year == null)
+			year = 0;
+		mdidController.genreYearText().setValue(genre + " - " + year);
+		
+	}
+	
 }
