@@ -17,17 +17,17 @@
             <ImageView fx:id="albumart" fitHeight="100.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true" />
             <VBox fx:id="labelsBox" alignment="CENTER_LEFT" prefHeight="110.0" prefWidth="467.0" spacing="2.0">
                <children>
-                  <Label fx:id="title" text="Gallayan Mithiyaan">
+                  <Label fx:id="titleLbl" prefHeight="32.0" prefWidth="459.0" text="Gallayan Mithiyaan">
                      <font>
                         <Font name="Segoe UI Semibold" size="22.0" />
                      </font>
                   </Label>
-                  <Label fx:id="albumArtist" text="Bas Ek Pal" textFill="#464343">
+                  <Label fx:id="albumArtistLbl" prefHeight="25.0" prefWidth="462.0" text="Bas Ek Pal" textFill="#464343">
                      <font>
                         <Font name="System Bold" size="16.0" />
                      </font>
                   </Label>
-                  <Label fx:id="genre" text="Bollywood Music - 2009" textFill="#4a4343" />
+                  <Label fx:id="genreLbl" prefHeight="17.0" prefWidth="453.0" text="Bollywood Music - 2009" textFill="#4a4343" />
                </children>
                <opaqueInsets>
                   <Insets top="5.0" />
@@ -45,13 +45,17 @@
          </padding></HBox>
       <HBox fx:id="rightHBox" alignment="CENTER_RIGHT" layoutX="600.0" prefHeight="120.0" prefWidth="212.0" spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Label prefHeight="17.0" prefWidth="87.0" text="--:--/--:--" textAlignment="CENTER">
-               <font>
-                  <Font size="15.0" />
-               </font>
-            </Label>
-            <ProgressIndicator fx:id="progressIndicator" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" prefHeight="51.0" prefWidth="58.0" progress="0.6" />
-            <Button fx:id="playButton" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" text="Play" />
+            <VBox alignment="CENTER" prefHeight="120.0" prefWidth="210.0">
+               <children>
+                  <HBox alignment="CENTER" prefHeight="75.0" prefWidth="177.0" spacing="30.0">
+                     <children>
+                        <ProgressIndicator fx:id="progressIndicator" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" prefHeight="51.0" prefWidth="58.0" progress="0.6" />
+                        <Button fx:id="playButton" ellipsisString="" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="45.0" />
+                     </children>
+                  </HBox>
+                  <Label fx:id="durationLbl" prefHeight="21.0" prefWidth="132.0" text="--:--/--:--" textAlignment="CENTER" />
+               </children>
+            </VBox>
          </children>
          <padding>
             <Insets right="10.0" />

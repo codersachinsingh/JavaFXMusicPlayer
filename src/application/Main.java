@@ -50,7 +50,7 @@ import java.util.List;
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException {
-    	FXMLLoader loader = new FXMLLoader();
+    	/*FXMLLoader loader = new FXMLLoader();
     	loader.setLocation(getClass().getResource("test.fxml"));
     	AnchorPane root = loader.load();
     	TestController testController = loader.getController();
@@ -103,9 +103,9 @@ public class Main extends Application {
     	primaryStage.setScene(scene);
     	primaryStage.show();
     	
+    	*/
     	
     	
-    	/*
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getClassLoader().getResource("musicplayer/ui/fxmls/main.fxml"));
         try {
@@ -118,7 +118,7 @@ public class Main extends Application {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} */
+		} 
     }
    
     private void decoratePrimaryStage(Stage primaryStage) {

@@ -1,11 +1,15 @@
 package musicplayer.ui.fxmls;
 
+import java.io.File;
 import java.io.IOException;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import musicplayer.media.MediaFileScanner;
 import musicplayer.media.MediaLibraryEngine;
 
@@ -50,6 +54,7 @@ public class MainController {
 		FXMLLoader loader = null;
 		try {
 			// Load Top Navigation Bar
+			loader = new FXMLLoader();
 			loader.setLocation(getClass().getClassLoader().getResource("musicplayer/ui/fxmls/TopNavigationBar.fxml"));
 			topNavigationbar = loader.load();
 			topNavigationBarController = loader.getController();
@@ -97,6 +102,63 @@ public class MainController {
 			playListScreen = loader.load();
 			playListScreenController = loader.getController();
 
+			// add event listeners
+			topBarController.nowPlaying.setOnAction((event) -> {
+				centerScreens.getChildren().set(0,nowPlayingScreen);
+				AnchorPane.setTopAnchor(nowPlayingScreen, 0.0);
+				AnchorPane.setBottomAnchor(nowPlayingScreen, 0.0);
+				AnchorPane.setRightAnchor(nowPlayingScreen, 0.0);
+				AnchorPane.setLeftAnchor(nowPlayingScreen, 0.0);
+				root.setBottom(null);
+			});
+			
+			
+			topBarController.songs.setOnAction((event)-> {
+				centerScreens.getChildren().set(0,songsList);
+				AnchorPane.setTopAnchor(songsList, 0.0);
+				AnchorPane.setBottomAnchor(songsList, 0.0);
+				AnchorPane.setRightAnchor(songsList, 0.0);
+				AnchorPane.setLeftAnchor(songsList, 0.0);
+				root.setBottom(nowPlayingBar);
+			});
+			
+			topBarController.albums.setOnAction((event)-> {
+				centerScreens.getChildren().set(0,albumsList);
+				AnchorPane.setTopAnchor(albumsList, 0.0);
+				AnchorPane.setBottomAnchor(albumsList, 0.0);
+				AnchorPane.setRightAnchor(albumsList, 0.0);
+				AnchorPane.setLeftAnchor(albumsList, 0.0);
+				root.setBottom(nowPlayingBar);
+			});
+			
+			topBarController.artists.setOnAction((event)-> {
+				centerScreens.getChildren().set(0,artistsList);
+				AnchorPane.setTopAnchor(artistsList, 0.0);
+				AnchorPane.setBottomAnchor(artistsList, 0.0);
+				AnchorPane.setRightAnchor(artistsList, 0.0);
+				AnchorPane.setLeftAnchor(artistsList, 0.0);
+				root.setBottom(nowPlayingBar);
+			});
+			
+			topBarController.genres.setOnAction((event)-> {
+				centerScreens.getChildren().set(0,genresList);
+				AnchorPane.setTopAnchor(genresList, 0.0);
+				AnchorPane.setBottomAnchor(genresList, 0.0);
+				AnchorPane.setRightAnchor(genresList, 0.0);
+				AnchorPane.setLeftAnchor(genresList, 0.0);
+				root.setBottom(nowPlayingBar);
+			});
+			
+			topBarController.playLists.setOnAction((event)-> {
+				centerScreens.getChildren().set(0,playListScreen);
+				AnchorPane.setTopAnchor(playListScreen, 0.0);
+				AnchorPane.setBottomAnchor(playListScreen, 0.0);
+				AnchorPane.setRightAnchor(playListScreen, 0.0);
+				AnchorPane.setLeftAnchor(playListScreen, 0.0);
+				root.setBottom(nowPlayingBar);
+			});
+			
+			
 			centerScreens.getChildren().add(nowPlayingScreen);
 			AnchorPane.setTopAnchor(nowPlayingScreen, 0.0);
 			AnchorPane.setBottomAnchor(nowPlayingScreen, 0.0);
@@ -104,10 +166,18 @@ public class MainController {
 			AnchorPane.setLeftAnchor(nowPlayingScreen, 0.0);
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		
+		nowPlayingScreenController.setNowPlayingBarController(nowPlayingBarController);
+		File file = new File("C:\\Users\\admin\\AppData\\Local\\JavaFXMusicPlayer\\AlbumArtworks\\Hostel (DjPunjab.CoM).jpg");
+		Image image = new Image(file.toURI().toString());
+		
+		Media media = new Media(new File("D:\\My Media\\Test\\song.mp3").toURI().toString());
+		MediaPlayer m = new MediaPlayer(media);
+		m.setOnReady(()-> {
+			nowPlayingScreenController.setMediaPlayer(m);
+		});
 		root.setBottom(null);
 	}
 }

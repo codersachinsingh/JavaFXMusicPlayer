@@ -10,6 +10,8 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ObservableMap;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
@@ -84,6 +86,8 @@ public class NowPlayingScreenController {
 	private AnchorPane metadataPane;
 	@FXML
 	private AnchorPane screen;
+	
+	NowPlayingBarController nowPlayingBarController;
 	//--------------------
 	private BooleanProperty repeat = new SimpleBooleanProperty(this,"repeat",false);
 	private BooleanProperty shuffle = new SimpleBooleanProperty(this,"shuffle",false);
@@ -200,14 +204,7 @@ public class NowPlayingScreenController {
 		setIcons();
 		bindControls();
 		initializeScreens();
-		File file = new File("C:\\Users\\admin\\AppData\\Local\\JavaFXMusicPlayer\\AlbumArtworks\\Hostel (DjPunjab.CoM).jpg");
-		Image image = new Image(file.toURI().toString());
 		
-		Media media = new Media(new File("D:\\My Media\\Test\\song.mp3").toURI().toString());
-		MediaPlayer m = new MediaPlayer(media);
-		m.setOnReady(()-> {
-			setMediaPlayer(m);
-		});
 		
 	}
 	
@@ -216,31 +213,14 @@ public class NowPlayingScreenController {
 		if (!playerSlider.isVisible())
 			playerSlider.setVisible(true);
 		duration = mediaplayer.getMedia().getDuration();
+		
 		if (duration != Duration.UNKNOWN) {
 			totalTimeLbl.setText(AppUtils.formatTime(duration));
+			nowPlayingBarController.durationLbl.setText("--:--/"+AppUtils.formatTime(duration));
 		}
-		playPauseBtn.setOnAction((event)-> {
-			Status status = mediaplayer.getStatus();
-			if (status == Status.UNKNOWN || status == Status.HALTED) {
-				
-			}
-			else {
-				if (status == Status.PAUSED || status == status.STOPPED || status == status.READY) {
-					mediaplayer.play();
-					updateControlValues();
-					mediaplayer.currentTimeProperty().addListener((e)-> {
-						updateControlValues();
-					});
-					playPauseBtn.setGraphic(AppUtils.getImageView(getClass().getClassLoader().getResource("icons/pause_circle.png").toExternalForm(), 40, 40));
-				}
-				else {
-					mediaplayer.pause();
-					updateControlValues();
-					playPauseBtn.setGraphic(AppUtils.getImageView(getClass().getClassLoader().getResource("icons/play_circle.png").toExternalForm(), 40, 40));
-				}
-			}
-		});
 		
+		playPauseBtn.setOnAction(this::haldlePlayPause);
+		nowPlayingBarController.playButton.setOnAction(this::haldlePlayPause);
 		playerSlider.setOnMouseClicked((event)-> {
 			playerSlider.setValueChanging(true);
 			double value = (event.getX()/playerSlider.getWidth()) * playerSlider.getMax();
@@ -256,6 +236,7 @@ public class NowPlayingScreenController {
 			if (mediaplayer.getStatus() == Status.PLAYING || mediaplayer.getStatus() == Status.STALLED || mediaplayer.getStatus() == Status.PAUSED) {
 				mediaplayer.stop();
 				playPauseBtn.setGraphic(AppUtils.getImageView(getClass().getClassLoader().getResource("icons/play_circle.png").toExternalForm(), 40, 40));
+				nowPlayingBarController.playButton.setGraphic(AppUtils.getImageView(getClass().getClassLoader().getResource("icons/play_circle.png").toExternalForm(), 40, 40));
 				updateControlValues();
 				
 			}
@@ -281,19 +262,23 @@ public class NowPlayingScreenController {
 		mediaplayer.setCycleCount(repeat.get()?MediaPlayer.INDEFINITE:1);
 		mediaplayer.setOnPlaying(()-> {
 			playPauseBtn.setGraphic(AppUtils.getImageView(getClass().getClassLoader().getResource("icons/pause_circle.png").toExternalForm(), 40, 40));
+			nowPlayingBarController.playButton.setGraphic(AppUtils.getImageView(getClass().getClassLoader().getResource("icons/pause_circle.png").toExternalForm(), 40, 40));
 		});
 		mediaplayer.setOnPaused(()-> {
 			playPauseBtn.setGraphic(AppUtils.getImageView(getClass().getClassLoader().getResource("icons/play_circle.png").toExternalForm(), 40, 40));
+			nowPlayingBarController.playButton.setGraphic(AppUtils.getImageView(getClass().getClassLoader().getResource("icons/play_circle.png").toExternalForm(), 40, 40));
 		});
 		mediaplayer.setOnEndOfMedia(()-> {
 			if (!repeat.get()) {
 				playPauseBtn.setGraphic(AppUtils.getImageView(getClass().getClassLoader().getResource("icons/play_circle.png").toExternalForm(), 40, 40));
+				nowPlayingBarController.playButton.setGraphic(AppUtils.getImageView(getClass().getClassLoader().getResource("icons/play_circle.png").toExternalForm(), 40, 40));
 				playerSlider.setValue(0.0);
 				atEndofMedia = true;
 				// request next track.
 			}
 		});
 		setMetaData(mediaplayer.getMedia().getMetadata(),mediaplayer.getMedia().getSource());
+		nowPlayingBarController.setMetaData(mediaplayer.getMedia().getMetadata(), mediaplayer.getMedia().getSource());
 		updateControlValues();
 		
 	}
@@ -301,10 +286,13 @@ public class NowPlayingScreenController {
 	private void updateControlValues() {
 		Platform.runLater(()-> {
 			Duration currentTime = mediaplayer.getCurrentTime();
-			currentTimeLbl.setText(AppUtils.formatTime(currentTime));
+			String current = AppUtils.formatTime(currentTime);
+			currentTimeLbl.setText(current);
+			nowPlayingBarController.durationLbl.setText(current+"/"+AppUtils.formatTime(duration));
 			playerSlider.setVisible(!duration.isUnknown());
 			if (playerSlider.isVisible() && duration.greaterThan(Duration.ZERO) && !playerSlider.isValueChanging()) {
 				playerSlider.setValue(currentTime.divide(duration).toMillis()*100.0);
+				nowPlayingBarController.progressIndicator.setProgress(currentTime.divide(duration).toMillis());
 			}
 			
 			if (!volSlider.isValueChanging()) {
@@ -344,5 +332,33 @@ public class NowPlayingScreenController {
 		mdidController.genreYearText().setValue(genre + " - " + year);
 		
 	}
+	public void setNowPlayingBarController(NowPlayingBarController nowPlayingBarController) {
+		this.nowPlayingBarController = nowPlayingBarController;
+	}
 	
+	private void haldlePlayPause(ActionEvent eventHandler) {
+		Status status = mediaplayer.getStatus();
+		if (status == Status.UNKNOWN || status == Status.HALTED) {
+			
+		}
+		else {
+			if (status == Status.PAUSED || status == Status.STOPPED || status == Status.READY) {
+				mediaplayer.play();
+				updateControlValues();
+				mediaplayer.currentTimeProperty().addListener((e)-> {
+					updateControlValues();
+				});
+				playPauseBtn.setGraphic(AppUtils.getImageView(getClass().getClassLoader().getResource("icons/pause_circle.png").toExternalForm(), 40, 40));
+				nowPlayingBarController.playButton.setGraphic(AppUtils.getImageView(getClass().getClassLoader().getResource("icons/pause_circle.png").toExternalForm(), 40, 40));
+			}
+			else {
+				mediaplayer.pause();
+				updateControlValues();
+				playPauseBtn.setGraphic(AppUtils.getImageView(getClass().getClassLoader().getResource("icons/play_circle.png").toExternalForm(), 40, 40));
+				nowPlayingBarController.playButton.setGraphic(AppUtils.getImageView(getClass().getClassLoader().getResource("icons/play_circle.png").toExternalForm(), 40, 40));
+			}
+		}
+	
+	}
+
 }
